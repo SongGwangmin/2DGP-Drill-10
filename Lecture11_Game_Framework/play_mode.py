@@ -2,20 +2,25 @@ from pico2d import *
 from boy import Boy
 from grass import Grass
 import game_world
+import game_framework
+import title_mode
+import item_mode
 
 def handle_events():
-    global running
 
     event_list = get_events()
     for event in event_list:
         if event.type == SDL_QUIT:
-            running = False
+            game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            running = False
+            game_framework.change_mode(title_mode)
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_i:
+            game_framework.push_mode(item_mode)
+            # push mode: 플레이 모드를 유지해야하므로
         else:
             boy.handle_event(event)
 
-def reset_world():
+def init():
     global boy
 
     grass = Grass()
@@ -24,23 +29,21 @@ def reset_world():
     boy = Boy()
     game_world.add_object(boy, 1)
 
+def finish():
+    game_world.clear()
 
-def update_world():
+def update():
     game_world.update()
 
 
-def render_world():
+def draw():
     clear_canvas()
     game_world.render()
     update_canvas()
 
-running = True
 
-open_canvas()
-reset_world()
-while running:
-    handle_events()
-    update_world()
-    render_world()
-    delay(0.01)
-close_canvas()
+def pause():
+    pass
+
+def resume():
+    pass
