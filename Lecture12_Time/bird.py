@@ -20,14 +20,14 @@ class Bird:
         self.xv = throwin_speed * math.cos(math.radians(throwin_angle))
 
         self.yv = abs(throwin_speed * math.sin(math.radians(throwin_angle)))
+        self.frame = 0
 
     def draw(self):
         self.image.draw(self.x, self.y)
 
     def update(self):
-
+        self.frame = (FRAMES_PER_SEC * game_framework.frame_time + self.frame) % 8
         self.x += self.xv * game_framework.frame_time * PIXEL_PER_METER
-        self.y += self.yv * game_framework.frame_time * PIXEL_PER_METER
         if self.y < 60:
             game_world.remove_object(self)
 
