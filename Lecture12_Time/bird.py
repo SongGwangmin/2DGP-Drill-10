@@ -9,10 +9,11 @@ RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
-centimeter = 30
+centimeter = 100
+meter = centimeter / 100
 
-time_per_action = 1.2
-frames_per_action = 8
+time_per_action = 1
+frames_per_action = 14
 actions_per_time = 1.0 / time_per_action
 FRAMES_PER_SEC = frames_per_action * actions_per_time
 
@@ -51,9 +52,9 @@ class Bird:
         action = frame_border[int(self.frame)]
 
         if self.dir == 1:
-            self.image.clip_composite_draw(action[0] - 4, 506 - action[3], 181, 167, 0, '', self.x, self.y, centimeter, centimeter)
+            self.image.clip_composite_draw(action[0] - 4, 506 - action[3], 181, 167, 0, '', self.x, self.y, meter * PIXEL_PER_METER, meter * PIXEL_PER_METER)
         else:
-            self.image.clip_composite_draw(action[0] - 4, 506 - action[3], 181, 167, 0, 'h', self.x, self.y, centimeter, centimeter)
+            self.image.clip_composite_draw(action[0] - 4, 506 - action[3], 181, 167, 0, 'h', self.x, self.y, meter * PIXEL_PER_METER, meter * PIXEL_PER_METER)
 
     def update(self):
         self.frame = (FRAMES_PER_SEC * game_framework.frame_time + self.frame) % 14
