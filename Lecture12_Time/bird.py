@@ -2,7 +2,11 @@ from pico2d import *
 import game_world
 import game_framework
 
-PIXEL_PER_METER = (10.0 / 0.3)
+PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
+RUN_SPEED_KMPH = 30.0            # Km / Hour
+RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
 
 time_per_action = 1.2
@@ -26,8 +30,7 @@ frame_border = [
     (4,   186, 338, 506),   # 3행 1열
     (187, 369, 338, 506),
     (370, 552, 338, 506),
-    (553, 735, 338, 506),
-    (736, 918, 338, 506),
+    (553, 735, 338, 506)
 ]
 
 max_frame = len(frame_border)
@@ -35,26 +38,29 @@ max_frame = len(frame_border)
 class Bird:
     image = None
 
-    def __init__(self, x = 400, y = 300, throwin_speed = 15, throwin_angle = 45): #velocity 15m/s
+    def __init__(self, x = 400, y = 300): #velocity 15m/s
         if Bird.image == None:
-            Bird.image = load_image('ball21x21.png')
+            Bird.image = load_image('bird_animation.png')
         self.x, self.y = x, y
-        self.xv = throwin_speed * math.cos(math.radians(throwin_angle))
-        self.yv = abs(throwin_speed * math.sin(math.radians(throwin_angle)))
+
         self.frame = 0
         self.dir = 1
 
     def draw(self):
         action = frame_border[int(self.frame)]
 
-        if dir == 1:
-            self.image.clip_composite_draw(action[0], action[1], action[3], action[4], 0, '', self.x, self.y, 100, 100)
+        if self.dir == 1:
+            self.image.clip_composite_draw(action[0] - 4, 506 - action[3], 181, 167, 0, '', self.x, self.y, 100, 100)
         else:
-            self.image.clip_composite_draw(action[0], action[1], action[3], action[4], 0, 'v', self.x, self.y, 100, 100)
+            self.image.clip_composite_draw(action[0] - 4, 506 - action[3], 181, 167, 0, 'h', self.x, self.y, 100, 100)
 
     def update(self):
-        self.frame = (FRAMES_PER_SEC * game_framework.frame_time + self.frame) % 15
-        self.x += self.xv * game_framework.frame_time * PIXEL_PER_METER
-        if self.y < 60:
-            game_world.remove_object(self)
+        self.frame = (FRAMES_PER_SEC * game_framework.frame_time + self.frame) % 14
+        self.x += game_framework.frame_time * RUN_SPEED_PPS * self.dir
+        if self.x < 30:
+            self.dir = 1
+            print(self.dir)
+        elif self.x > 1600 - 30:
+            self.dir = -1
+            print(self.dir)
 
