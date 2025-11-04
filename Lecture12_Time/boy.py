@@ -30,13 +30,22 @@ def left_up(e):
 
 
 # Boy의 Run Speed 계산
+PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
+RUN_SPEED_KMPH = 20.0            # Km / Hour
+RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
 
 # Boy Run Speed
 # 여기를 채우시오.
 
 
-
-
+# frame per sec는 frame per action * action per sec
+time_per_action = 0.3
+frames_per_action = 8
+actions_per_time = 1.0 / time_per_action
+FRAMES_PER_SEC = frames_per_action * actions_per_time
 
 
 
@@ -58,15 +67,15 @@ class Idle:
 
 
     def do(self):
-        self.boy.frame = (self.boy.frame + 1) % 8
+        self.boy.frame = (FRAMES_PER_SEC * game_framework.frame_time + self.boy.frame) % 8
         if get_time() - self.boy.wait_time > 3:
             self.boy.state_machine.handle_state_event(('TIMEOUT', None))
 
     def draw(self):
         if self.boy.face_dir == 1: # right
-            self.boy.image.clip_draw(self.boy.frame * 100, 300, 100, 100, self.boy.x, self.boy.y)
+            self.boy.image.clip_draw(int(self.boy.frame) * 100, 300, 100, 100, self.boy.x, self.boy.y)
         else: # face_dir == -1: # left
-            self.boy.image.clip_draw(self.boy.frame * 100, 200, 100, 100, self.boy.x, self.boy.y)
+            self.boy.image.clip_draw(int(self.boy.frame) * 100, 200, 100, 100, self.boy.x, self.boy.y)
 
 
 class Sleep:
@@ -81,7 +90,7 @@ class Sleep:
         pass
 
     def do(self):
-        self.boy.frame = (self.boy.frame + 1) % 8
+        self.boy.frame = (FRAMES_PER_SEC * game_framework.frame_time + self.boy.frame) % 8
 
 
     def handle_event(self, event):
@@ -89,9 +98,9 @@ class Sleep:
 
     def draw(self):
         if self.boy.face_dir == 1:
-            self.boy.image.clip_composite_draw(self.boy.frame* 100, 300, 100, 100, 3.141592/2, '', self.boy.x - 25, self.boy.y - 25, 100, 100)
+            self.boy.image.clip_composite_draw(int(self.boy.frame) * 100, 300, 100, 100, 3.141592/2, '', self.boy.x - 25, self.boy.y - 25, 100, 100)
         else:
-            self.boy.image.clip_composite_draw(self.boy.frame * 100, 200, 100, 100, -3.141592/2, '', self.boy.x + 25, self.boy.y - 25, 100, 100)
+            self.boy.image.clip_composite_draw(int(self.boy.frame) * 100, 200, 100, 100, -3.141592/2, '', self.boy.x + 25, self.boy.y - 25, 100, 100)
 
 
 
@@ -110,15 +119,17 @@ class Run:
             self.boy.fire_ball()
 
     def do(self):
-        self.boy.frame = (self.boy.frame + 1) % 8
-        self.boy.x += self.boy.dir * 5
+        self.boy.frame = (FRAMES_PER_SEC * game_framework.frame_time + self.boy.frame) % 8
+        self.boy.x += self.boy.dir * RUN_SPEED_PPS * game_framework.frame_time
+
 
     def draw(self):
         if self.boy.face_dir == 1: # right
-            self.boy.image.clip_draw(self.boy.frame * 100, 100, 100, 100, self.boy.x, self.boy.y)
+            self.boy.image.clip_draw(int(self.boy.frame) * 100, 100, 100, 100, self.boy.x, self.boy.y)
         else: # face_dir == -1: # left
-            self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y)
+            self.boy.image.clip_draw(int(self.boy.frame) * 100, 0, 100, 100, self.boy.x, self.boy.y)
 
+# frame per second와 delta t를 이용해 프레임 전환
 
 
 
@@ -127,7 +138,7 @@ class Run:
 
 class Boy:
     def __init__(self):
-
+        self.font = load_font('ENCR10B.TTF', 16)
         self.item = None
 
         self.x, self.y = 400, 90
@@ -160,6 +171,7 @@ class Boy:
 
     def draw(self):
         self.state_machine.draw()
+        self.font.draw(self.x - 60, self.y + 50, f'{get_time():.2f}', (255, 255, 0))
 
 
     def fire_ball(self):
