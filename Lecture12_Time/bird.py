@@ -1,6 +1,7 @@
 from pico2d import *
 import game_world
 import game_framework
+import random
 
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
 RUN_SPEED_KMPH = 30.0            # Km / Hour
@@ -8,6 +9,7 @@ RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
+centimeter = 30
 
 time_per_action = 1.2
 frames_per_action = 8
@@ -33,7 +35,6 @@ frame_border = [
     (553, 735, 338, 506)
 ]
 
-max_frame = len(frame_border)
 
 class Bird:
     image = None
@@ -43,16 +44,16 @@ class Bird:
             Bird.image = load_image('bird_animation.png')
         self.x, self.y = x, y
 
-        self.frame = 0
+        self.frame = random.randint(0, 13)
         self.dir = 1
 
     def draw(self):
         action = frame_border[int(self.frame)]
 
         if self.dir == 1:
-            self.image.clip_composite_draw(action[0] - 4, 506 - action[3], 181, 167, 0, '', self.x, self.y, 100, 100)
+            self.image.clip_composite_draw(action[0] - 4, 506 - action[3], 181, 167, 0, '', self.x, self.y, centimeter, centimeter)
         else:
-            self.image.clip_composite_draw(action[0] - 4, 506 - action[3], 181, 167, 0, 'h', self.x, self.y, 100, 100)
+            self.image.clip_composite_draw(action[0] - 4, 506 - action[3], 181, 167, 0, 'h', self.x, self.y, centimeter, centimeter)
 
     def update(self):
         self.frame = (FRAMES_PER_SEC * game_framework.frame_time + self.frame) % 14
