@@ -7,6 +7,7 @@ import game_world
 
 import game_framework
 
+import random
 
 boy = None
 
@@ -30,8 +31,10 @@ def init():
     grass = Grass()
     game_world.add_object(grass, 0)
 
-    bird = Bird()
-    game_world.add_object(bird, 1)
+    birds = [Bird(random.randint(50, 1550), random.randint(300 - 70, 300)) for _ in range(10)]
+
+    game_world.world[1] += birds
+
 
     boy = Boy()
     game_world.add_object(boy, 1)
