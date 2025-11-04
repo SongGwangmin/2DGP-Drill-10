@@ -23,7 +23,7 @@ class Bird:
         self.frame = 0
 
     def draw(self):
-        self.image.draw(self.x, self.y)
+        self.image.clip_composite_draw(int(self.frame) * 100, 300, 100, 100, 0, 'v', self.x, self.y, 100, 100)
 
     def update(self):
         self.frame = (FRAMES_PER_SEC * game_framework.frame_time + self.frame) % 8
